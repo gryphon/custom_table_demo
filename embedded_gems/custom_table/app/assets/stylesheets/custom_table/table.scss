@@ -1,0 +1,140 @@
+
+table.custom-table {
+
+  td.actions {
+    white-space: nowrap;
+    width: 85px;
+  }
+  a.sort_link {
+    text-decoration: none !important;
+    white-space: nowrap;
+  }
+  td.selected {
+    outline: 2px solid rgb(26, 179, 26) !important;
+  }
+
+  tr {
+    .action {
+      visibility: hidden;
+      &.btn-sm {
+        padding: 2px 4px !important;
+      }
+    }
+    .d-action-none {
+      display: none;
+    }
+
+
+    &:hover {
+      .action {
+        visibility: visible;
+      }
+      .d-action-none {
+        display: inherit;
+      }
+    }
+
+    .checkbox-col {
+      width: 20px;
+    }
+
+  }
+
+
+
+  tr.sticky, thead.sticky {
+    position: sticky;
+    background: white;
+    z-index: 1;
+  }
+  th.sticky-left, td.sticky-left {
+    position: sticky;
+    left: 0px;
+    background: white;
+  }
+  .text-sm {
+    font-size: 11px;
+  }
+
+  .tree-opener {
+    cursor: pointer;
+    .opened {
+      display: none;
+    }
+    &.opened {
+      .opened {
+        display: inline;
+      }
+      .closed {
+        display: none;
+      }
+    }
+  }
+  
+  .table-sum {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    width: 150px;
+    background: white;
+    border: 2px solid black;
+    padding: 2px;
+    text-align: right;
+    margin-right: 5px;
+    z-index: 1000;
+  }
+
+}
+
+.batch-hidden {
+  th.checkbox-col, td.checkbox-col {
+    display: none;
+  }
+  .batch-actions {
+    display: none;
+  }
+}
+
+.widget table.custom-table td {
+  max-width: 120px;
+  overflow: hidden;
+}
+
+@include media-breakpoint-down(md) {
+  .custom-table-filter {
+    > :not(.has-value, .btn-group, .sm-visible) {
+      display: none;
+    }
+    &.show-all {
+      > :not(.has-value, .btn-group, .sm-visible) {
+        display: block;
+      }
+    }
+  }
+
+}
+
+
+@include media-breakpoint-down(lg) {
+  .overflow-x-lg-scroll {
+    overflow-x: scroll;
+  }
+
+}
+
+@include media-breakpoint-up(sm) {
+  .custom-table-settings {
+    columns: 2
+  }
+}
+
+
+@include media-breakpoint-up(lg) {
+  .modal-lg, .modal-xl {
+    .custom-table-settings {
+      columns: 3
+    }
+  }
+}
+
+

@@ -1,0 +1,27 @@
+en:
+  custom_table:
+    search: Search
+    customize_table: Choose columns
+    customize_table_description: Choose columns you want to see in the table and sort them
+    customization_not_allowed: Customization of %{model} table is not allowed
+    customization_saved: Table columns customization saved!
+    cannot_save_customization: Cannot save customization
+    save_settings: Save Settings
+    reset_settings: Reset to default
+    are_you_sure: Are you sure?
+    date_from: from
+    date_to: to
+    clear_search: Clear search
+    no_records_found: No records found
+    download_as_csv: Download as CSV
+    huge_xlsx_alert: Too many records to download in Excel format. Try %{csv}
+    quick_search: Quick Search
+    download_only_selected_fields: Download selected columns only
+    show_all_filters: Show all filters
+    batch_update: Change selected
+    batch_destroy: Delete selected
+    batch_action_description: Mark fields for changing with check boxes
+    batch_selected_items_count: 
+      one: "One item selected for batch update"
+      few: "%{count} items selected for batch update"
+      many: "%{count} items selected for batch update"

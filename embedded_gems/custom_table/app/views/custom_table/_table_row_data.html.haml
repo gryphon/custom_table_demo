@@ -1,0 +1,15 @@
+- model_class = item.class
+- fields = custom_table_fields_for(model_class, use_all_fields: true, variant: local_assigns[:variant], predefined_fields: local_assigns[:fields]) 
+- model_name = item.model_name.singular # Allows to show different class models in one table!
+
+- fields.each do |field, defs|
+  - next if defs[:table] == false
+
+  = turbo_stream.update dom_id(item, field) do
+    - v = field_value_for(item, field, definitions: defs)
+
+    - if defs[:link_to_show] == true && custom_table_has_show_route?(item)
+      -# = link_to v, url_for(controller: controller_name, action: "show", id: item.to_param)
+      = link_to v, [namespace, item]
+    - else
+      = v

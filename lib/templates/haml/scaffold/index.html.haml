@@ -1,0 +1,9 @@
+%h2
+  = <%= singular_table_name %>_icon
+  = <%= plural_table_name.classify %>.model_name.human count: 2
+  .float-end
+    - if can? :create, <%= plural_table_name.classify %>
+      = link_to t('add'), new_<%= singular_table_name %>_path, class: "btn btn-outline-success", data: {"turbo-frame": "remote-modal"}
+
+= custom_table_filter <%= plural_table_name.classify %>
+= custom_table_data @<%= plural_table_name %>

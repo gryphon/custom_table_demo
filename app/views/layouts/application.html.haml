@@ -1,0 +1,33 @@
+!!!
+%html
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %title App
+    %meta{:content => "width=device-width,initial-scale=1", :name => "viewport"}/
+    = csrf_meta_tags
+    = csp_meta_tag
+    = stylesheet_link_tag "application", "data-turbo-track": "reload"
+    = javascript_include_tag "application", "data-turbo-track": "reload", type: "module"
+  %body
+
+    .container
+
+      %h1 Custom Table Demo
+
+      .pt-1.pb-1.border-2.border-bottom.mb-2
+        - if user_signed_in?
+          Signed in as
+          %b= current_user.email
+          .d-inline-block
+            = button_to "Sign out", destroy_user_session_path, method: "delete", class: "btn btn-danger", data: {turbo: false}
+        - else
+          You are not signed in now. Sign in as random user to check table customization demo
+          .d-inline-block
+            = button_to "Sign in", sign_in_path, class: "btn btn-success", data: {turbo: false}
+
+      -# - flash.each do |f|
+      -#   = f[1]
+
+      = yield
+
+      = turbo_frame_tag "remote-modal", target: "_top"

@@ -1,0 +1,234 @@
+- model_class = local_assigns[:model_class].presence || collection.model
+- global_model_name = model_class.model_name.singular
+- fields_totals = {}
+- variant = local_assigns[:variant]
+- if local_assigns[:tree] && local_assigns[:paginate]
+  %p.text-danger Tree mode is incompartible with pagination
+
+- if collection.respond_to?(:model)
+  - customization = custom_table_user_customization_for(collection.model, variant)
+  - per_page = params[:per] || customization&.dig(:per_page).presence || 25
+  - collection = collection.page(params[:page]).per(per_page) if local_assigns[:paginate]
+  - collection = collection.without_count if !local_assigns[:last_page] # Disable Last Page for performance
+
+- local_assigns[:fields] = params[:fields].split(",").map { |x| x.to_sym } if local_assigns[:fields].nil? && !params[:fields].blank?
+- local_assigns[:skip_actions] = true if local_assigns[:skip_actions].nil? && params[:skip_actions].to_s=="true"
+
+- fields = custom_table_fields_for(model_class, variant: variant, predefined_fields: local_assigns[:fields]) 
+
+- fields = fields.except(*local_assigns[:skip_fields]) if !local_assigns[:skip_fields].nil?
+
+%div.table-wrapper.overflow-x-lg-scroll{data: {controller: "batch-actions"}, class: (local_assigns[:batch_activator] ? "batch-hidden" : "")}
+
+  - if local_assigns[:batch_actions]
+    .batch-actions
+      - if local_assigns[:batch_actions] === true
+        = self.send(:custom_table_batch_actions, model_class)
+      - else
+        = self.send(local_assigns[:batch_actions])
+
+  %table{class: ["search-fields", "custom-table", "table", "table-hover", "table-sm", model_class.model_name.plural], data: {controller: "table toggle"}}
+    %thead.sticky-lg-top
+      - if local_assigns[:quick_filter]
+        %tr
+          %td{colspan: "100%"}
+            .input-group.input-group-sm
+              .input-group-text
+                = custom_table_search_icon
+              %input.form-control-sm.form-control{type: "text", data: {action: "table#search"}, placeholder: t("custom_table.quick_search")}
+
+
+      %tr
+
+        - if local_assigns[:tree]
+          %th{style: "width: 15px;"}
+
+        - if local_assigns[:sortable]
+          %th{style: "width: 15px;"}
+
+        - if local_assigns[:with_select]
+          %th.checkbox-col
+            = check_box_tag "check-all", "", true, data: {"toggle-target": "toggler", "action": "toggle#toggle batch-actions#refresh"}
+        - if local_assigns[:with_index]
+          %th= "#"
+
+        - fields.each_with_index do |(field, defs), index|
+          - next if defs[:table] == false
+          - cls = [field.to_s]
+          - defs[:amount] = true if defs[:amount].nil? && !model_class.columns_hash[field.to_s].nil? && [:float, :decimal, :integer].include?(model_class.columns_hash[field.to_s].type) && !model_class.defined_enums.has_key?(field.to_s)
+          - cls += ["text-end"] if defs[:amount]
+          %th{class: cls}
+
+            - if local_assigns[:batch_activator] && index==0
+              %input{type: "checkbox", data: {"batch-actions-target": "activator", action: "batch-actions#activate"}}
+
+            - if !defs[:sort].nil? && !@q.nil?
+              - defs[:sort] = {} if defs[:sort]===true
+              - sort_field = defs[:sort][:field].blank? ? field : defs[:sort][:field]
+              - sort_order = defs[:sort][:default_order].blank? ? :asc : defs[:sort][:default_order]
+              - if !@q.nil?
+                = sort_link @q, sort_field, default_order: sort_order, data: {sort: "custom-table-sort-#{sort_field}-#{sort_order}"} do
+                  = defs[:label].nil? ? model_class.human_attribute_name(field) : defs[:label]
+            - else
+              = defs[:label].nil? ? model_class.human_attribute_name(field) : defs[:label]
+
+        - if !local_assigns[:skip_actions]
+          %th.text-end
+
+    - table_data_tag = {}
+    - table_data_tag["controller"] = "sortable"
+    - table_data_tag["sortable-resource-name-value"] = model_class.model_name.singular
+    - table_data_tag["sortable-handle-value"] = ".sort-handler"
+
+    %tbody{data: table_data_tag}
+
+      - position = 0
+
+      - if local_assigns[:tree]
+
+        - if collection.length > 0
+
+          - grouped_collection = collection.group_by{|i| i.parent_id}
+
+          - if !grouped_collection[nil].nil?
+
+            - grouped_collection[nil].each do |parent_item|
+
+              - childs = grouped_collection[parent_item.id] || []
+              
+              = render "custom_table/table_row", local_assigns.merge({item: parent_item, fields: fields, position: position, fields_totals: fields_totals, has_children: (childs.length > 0)})
+              - position+=1
+
+              - childs.each do |item|
+                - position+=1
+                = render "custom_table/table_row", local_assigns.merge({item: item, fields: fields, position: position, fields_totals: fields_totals})
+
+      - elsif local_assigns[:group_by]
+
+        - if collection.length > 0
+
+          - grouped_collection = collection.group_by{|i| self.send(local_assigns[:group_by], i)}
+
+          -# - (grouped_collection[nil] || []).each do |ungrouped_items|
+          -#   - ungrouped_items.each do |item|
+          -#     - position+=1
+          -#     = render "custom_table/table_row", local_assigns.merge({item: item, fields: fields, position: position, fields_totals: fields_totals})
+
+          -# - abort Hash[grouped_collection.sort_by{|k,v| k.to_s}].inspect
+
+          - group_id = 0
+
+          - Hash[grouped_collection.sort_by{|k,v| k.to_s}].each do |group, items|
+
+            - if !group.nil?
+
+              - group_id += 1
+
+              -# Calculating group totals
+              - group_fields_totals = {}
+
+              - items.each do |item|
+                - custom_table_fields_totals(fields: fields, item: item, totals: local_assigns[:totals], variant: variant, fields_totals: group_fields_totals)
+              %tr
+                - if group_fields_totals.values.empty?
+                  %th{class: ["text-start", "text-nowrap"], colspan: fields.length}
+                    = tree_opener(group_id, true, local_assigns[:expanded])
+                    = group.to_s
+                - else
+                  - shown = false
+                  - fields.each do |field, defs|
+                    - next if defs[:table] == false
+                    - if !group_fields_totals[field].nil?
+                      %th{class: [field.to_s, "text-end"]}
+                        = amount_color group_fields_totals[field]
+                    - else
+                      %th{class: [field.to_s, "text-start"]}
+                        - if !shown
+                          %span.text-nowrap
+                            = tree_opener(group_id, true, local_assigns[:expanded])
+                            = render(group) rescue group.to_s
+                          - shown = true
+                - if !local_assigns[:skip_actions]
+                  %th.text-end
+                    - if !local_assigns[:group_actions].nil?
+                      = self.send(local_assigns[:group_actions], group)
+
+            - items.each do |item|
+              - position+=1
+              - la = local_assigns.merge({item: item, fields: fields, position: position, fields_totals: fields_totals, grouped_by_id: group_id})
+              - la[:expanded] = true if group.nil? # Items without group will be shown anyway
+              = render "custom_table/table_row", la
+
+      - else
+
+        - collection.each do |item|
+
+          - position+=1
+
+          = render "custom_table/table_row", local_assigns.merge({item: item, fields: fields, position: position, fields_totals: fields_totals})
+
+      - if local_assigns.has_key?(:extra) && !extra.nil?
+        - extra.each do |er|
+          %tr
+            - fields.each do |field, defs|
+              - next if defs[:table] == false
+              %td{class: [field.to_s]}
+                = er[field]
+            %td
+
+      - if collection.length == 0
+        %tr.warning.text-center
+          %th{:colspan=>"100%"}
+            = local_assigns[:no_records_message] || t("custom_table.no_records_found")
+      - else
+
+        - found_totals = custom_table_totals(collection, fields, local_assigns[:totals], fields_totals)
+
+        - if !found_totals.empty?
+
+          %tr.totals{data: ((CustomTable.configuration.move_totals_top || local_assigns[:move_totals_top]) ? {"table-target": "move"} : {})}
+            - if local_assigns[:tree]
+              %th
+
+            - if local_assigns[:with_index]
+              %th
+
+            - if local_assigns[:sortable]
+              %td
+
+            - if local_assigns[:with_select]
+              %th
+
+            - fields.each do |field, defs|
+              - next if defs[:table] == false
+              %th{class: [field.to_s, "text-end"]}
+                - if !found_totals[field].nil?
+                  - if found_totals[field].is_a?(Numeric)
+                    = amount_color found_totals[field]
+                  - else
+                    = found_totals[field]
+            %th.text-end
+
+- if collection.respond_to? :total_pages
+  .custom-table-pagination.overflow-hidden
+    -# - if turbo_frame_request?
+    -#   - if !collection.last_page?
+    -#     = link_to_next_page collection, raw(t('views.pagination.next'))
+    -# - else
+
+    - begin
+      - if collection.total_count > 25
+        %nav.float-end.ms-2.d-none.d-sm-block
+          %ul.pagination
+            - [25, 50, 100].each do |p|
+              %li.page-item{class: (collection.limit_value.to_i == p) ? "active" : ""}
+                = link_to p, url_for(params.permit!.merge({per: p})), class: "page-link"
+
+      = paginate(collection, theme: 'bootstrap-5') 
+    - rescue
+      = link_to_prev_page collection, t("views.pagination.previous").html_safe, class: "btn btn-outline-primary"
+      = link_to_next_page collection, t("views.pagination.next").html_safe, class: "btn btn-outline-primary"
+
+  -# - "TODO: Remove with param"
+  -# - if false && turbo_frame_request? && params[:q].present?
+  -#   = link_to t("show_all"), url_for(q: params[:q]), data: {turbo: false}, class: "text-right"
