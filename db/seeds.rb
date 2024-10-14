@@ -8,9 +8,12 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+puts "Deleting all users"
 User.delete_all
 
+puts "Creating 100 users"
 1.upto 100 do |n|
   User.create!(email: "user#{n}@test.com", password: "asdasdasd", password_confirmation: "asdasdasd")
 end
 
+puts "Seeds done"
