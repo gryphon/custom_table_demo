@@ -12,6 +12,7 @@
     "bootstrap-icons": "^1.11.3",
     "custom_table": "link:embedded_gems/custom_table",
     "sortablejs": "^1.15.0",
+    "flatpickr": "^4.6.9",
     "stimulus": "^3.2.2",
     "turbo_remote_modal": "git+https://github.com/gryphon/turbo_remote_modal.git"
   },

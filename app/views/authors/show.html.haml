@@ -1,0 +1,10 @@
+%h2.d-flex
+  .flex-grow-1
+    = author_icon
+    = Author.model_name.human(count: "other")
+  .actions
+    = link_to t('edit'), [:edit, @author], class: "btn btn-outline-primary", data: {"turbo-frame": "remote-modal"}
+    = link_to t('destroy'), @author, form: {data: { "turbo-method": "delete", "turbo-confirm": t("are_you_sure") }, class: 'd-inline'}, title: t("destroy"), class: "btn btn-outline-danger"
+
+= fieldset @author do |fs|
+  = fs.field :name

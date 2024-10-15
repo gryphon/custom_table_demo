@@ -1,7 +1,9 @@
 Rails.application.routes.draw do
+  resources :authors
+  resources :books
+  resources :genres
 
   devise_for :users
-  resources :books
 
   post "sign_in", to: "sign_in#sign"
   mount CustomTable::Engine, at: "/custom_table"

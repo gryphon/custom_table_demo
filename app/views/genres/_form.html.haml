@@ -1,0 +1,9 @@
+= floating_form_for(@genre) do |f|
+
+  = f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present?
+
+  = f.input :name
+
+  = f.association :parent
+
+  = f.button :submit, class: "btn btn-success"

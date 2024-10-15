@@ -1,0 +1,9 @@
+%h2.d-flex
+  .flex-grow-1
+    = author_icon
+    = Author.model_name.human count: 2
+  .actions
+    = link_to t('add'), new_author_path, class: "btn btn-outline-success", data: {"turbo-frame": "remote-modal"}
+
+= custom_table_filter Author
+= custom_table_data @authors, sortable: true, paginate: false

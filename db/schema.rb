@@ -10,11 +10,34 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_10_144630) do
-  create_table "books", force: :cascade do |t|
+ActiveRecord::Schema[7.2].define(version: 2024_10_15_181117) do
+  create_table "authors", force: :cascade do |t|
     t.string "name"
+    t.integer "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "books", force: :cascade do |t|
+    t.string "name"
+    t.integer "genre_id", null: false
+    t.date "released_at"
+    t.integer "status"
+    t.boolean "featured"
+    t.integer "pages"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "author_id"
+    t.index ["author_id"], name: "index_books_on_author_id"
+    t.index ["genre_id"], name: "index_books_on_genre_id"
+  end
+
+  create_table "genres", force: :cascade do |t|
+    t.string "name"
+    t.integer "parent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_genres_on_parent_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -34,4 +57,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_10_144630) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "books", "genres"
 end

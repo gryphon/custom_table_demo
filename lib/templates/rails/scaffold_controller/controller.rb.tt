@@ -1,12 +1,19 @@
 <% module_namespacing do -%>
 class <%= controller_class_name %>Controller < ApplicationController
 
+  <%- if Gem::Specification.find_all_by_name("cancancan").any? -%>
   load_and_authorize_resource :<%= singular_table_name %>
+  <%- else -%>
+  before_action :get_<%= singular_table_name %>, except: [:index, :new, :create]
+  <%- end -%>
 
   # TIP: Remove show action from router and you will get editing form inline automatically
 
   # GET <%= route_url %>
   def index
+    <%- if !Gem::Specification.find_all_by_name("cancancan").any? -%>
+    @<%= plural_table_name %> = <%= class_name %>.all
+    <%- end -%>
     @<%= plural_table_name %> = custom_table(@<%= plural_table_name %>)
   end
 
@@ -16,6 +23,9 @@ class <%= controller_class_name %>Controller < ApplicationController
 
   # GET <%= route_url %>/new
   def new
+  <%- if !Gem::Specification.find_all_by_name("cancancan").any? -%>
+    @<%= singular_table_name %> = <%= class_name %>.new
+  <%- end -%>
   end
 
   # GET <%= route_url %>/1/edit
@@ -24,6 +34,9 @@ class <%= controller_class_name %>Controller < ApplicationController
 
   # POST <%= route_url %>
   def create
+    <%- if !Gem::Specification.find_all_by_name("cancancan").any? -%>
+    @<%= singular_table_name %> = <%= class_name %>.new(<%= "#{singular_table_name}_params" %>)
+    <%- end -%>
     if @<%= orm_instance.save %>
       redirect_to defined?(:<%= singular_table_name %>_path) ? @<%= singular_table_name %> : <%= redirect_resource_name %>, notice: t("notices.successfully_created")
     else
@@ -47,6 +60,12 @@ class <%= controller_class_name %>Controller < ApplicationController
   end
 
   private
+
+    <%- if !Gem::Specification.find_all_by_name("cancancan").any? -%>
+    def get_<%= singular_table_name %>
+      @<%= singular_table_name %> = <%= class_name %>.find(params[:id])
+    end
+    <%- end -%>
 
     # Only allow a list of trusted parameters through.
     def <%= "#{singular_table_name}_params" %>

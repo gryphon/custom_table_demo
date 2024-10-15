@@ -2,9 +2,16 @@
 
   = f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present?
 
-  .form-inputs
-    = editable_input @book, :name do
-      = f.input :name, placeholder: "name"
+  = f.input :name
 
-  .form-actions
-    = f.button :submit, class: "btn btn-success"
+  = f.association :genre
+
+  = f.input :released_at
+
+  = f.input :status
+
+  = f.input :featured, wrapper: :custom_boolean_switch
+
+  = f.input :pages
+
+  = f.button :submit, class: "btn btn-success"

@@ -1,11 +1,17 @@
-%h2
-  = <%= singular_table_name %>_icon
-  = <%= singular_table_name.capitalize %>.model_name.human(count: "other")
-  .float-end
-    - if can? :edit, <%= plural_table_name.classify %>
+%h2.d-flex
+  .flex-grow-1
+    = <%= singular_table_name %>_icon
+    = <%= singular_table_name.capitalize %>.model_name.human(count: "other")
+  .actions
+    <%- if Gem::Specification.find_all_by_name("cancancan").any? -%>
+    - if can? :edit, @<%= singular_table_name %>
       = link_to t('edit'), [:edit, @<%= singular_table_name %>], class: "btn btn-outline-primary", data: {"turbo-frame": "remote-modal"}
-    - if can? :destroy, <%= plural_table_name.classify %>
-      = button_to t('destroy'), @<%= singular_table_name %>, method: "delete", form: {data: { "turbo-frame": true, "turbo-confirm": t("are_you_sure") }, class: 'd-inline'}, title: t("destroy"), class: "btn btn-outline-danger"
+    - if can? :destroy, @<%= singular_table_name %>
+      = link_to t('destroy'), @<%= singular_table_name %>, form: {data: { "turbo-method": "delete", "turbo-confirm": t("are_you_sure") }, class: 'd-inline'}, title: t("destroy"), class: "btn btn-outline-danger"
+    <%- else -%>
+    = link_to t('edit'), [:edit, @<%= singular_table_name %>], class: "btn btn-outline-primary", data: {"turbo-frame": "remote-modal"}
+    = link_to t('destroy'), @<%= singular_table_name %>, form: {data: { "turbo-method": "delete", "turbo-confirm": t("are_you_sure") }, class: 'd-inline'}, title: t("destroy"), class: "btn btn-outline-danger"
+    <%- end -%>
 
 = fieldset @<%= singular_table_name %> do |fs|
 <% for attribute in attributes -%>

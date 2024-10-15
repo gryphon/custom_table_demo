@@ -1,8 +1,8 @@
-%h2
-  = book_icon
-  = Book.model_name.human count: 2
-  .float-end
-    -# - if can? :create, Book
+%h2.d-flex
+  .flex-grow-1
+    = book_icon
+    = Book.model_name.human count: 2
+  .actions
     = link_to t('add'), new_book_path, class: "btn btn-outline-success", data: {"turbo-frame": "remote-modal"}
 
 = custom_table_filter Book

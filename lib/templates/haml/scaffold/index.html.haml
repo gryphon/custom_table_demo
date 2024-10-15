@@ -1,9 +1,14 @@
-%h2
-  = <%= singular_table_name %>_icon
-  = <%= plural_table_name.classify %>.model_name.human count: 2
-  .float-end
+%h2.d-flex
+  .flex-grow-1
+    = <%= singular_table_name %>_icon
+    = <%= plural_table_name.classify %>.model_name.human count: 2
+  .actions
+    <%- if Gem::Specification.find_all_by_name("cancancan").any? -%>
     - if can? :create, <%= plural_table_name.classify %>
       = link_to t('add'), new_<%= singular_table_name %>_path, class: "btn btn-outline-success", data: {"turbo-frame": "remote-modal"}
+    <%- else -%>
+    = link_to t('add'), new_<%= singular_table_name %>_path, class: "btn btn-outline-success", data: {"turbo-frame": "remote-modal"}
+    <%- end -%>
 
 = custom_table_filter <%= plural_table_name.classify %>
 = custom_table_data @<%= plural_table_name %>

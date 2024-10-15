@@ -1,11 +1,15 @@
-%h2
-  = book_icon
-  = Book.model_name.human(count: "other")
-  .float-end
-    -# - if can? :edit, Book
-    -#   = link_to t('edit'), [:edit, @book], class: "btn btn-outline-primary", data: {"turbo-frame": "remote-modal"}
-    -# - if can? :destroy, Book
-    -#   = button_to t('destroy'), @book, method: "delete", form: {data: { "turbo-frame": true, "turbo-confirm": t("are_you_sure") }, class: 'd-inline'}, title: t("destroy"), class: "btn btn-outline-danger"
+%h2.d-flex
+  .flex-grow-1
+    = book_icon
+    = Book.model_name.human(count: "other")
+  .actions
+    = link_to t('edit'), [:edit, @book], class: "btn btn-outline-primary", data: {"turbo-frame": "remote-modal"}
+    = link_to t('destroy'), @book, form: {data: { "turbo-method": "delete", "turbo-confirm": t("are_you_sure") }, class: 'd-inline'}, title: t("destroy"), class: "btn btn-outline-danger"
 
 = fieldset @book do |fs|
   = fs.field :name
+  = fs.field :genre
+  = fs.field :released_at
+  = fs.field :status
+  = fs.field :featured
+  = fs.field :pages

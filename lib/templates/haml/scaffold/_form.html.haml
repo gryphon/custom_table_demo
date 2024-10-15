@@ -2,19 +2,29 @@
 
   = f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present?
 
-  .form-inputs
   <%- attributes.each do |attribute| -%>
-    = editable_input @<%= singular_table_name %>, :<%= attribute.name %> do
-      <%- if attribute.reference? -%>
-      = f.association :<%= attribute.name %>
-      <%- elsif attribute.type == :boolean -%>
-      = f.input :<%= attribute.name %>, wrapper: :custom_boolean_switch
-      <%- elsif attribute.type == :text -%>
-      = f.input :<%= attribute.name %>, as: :text, input_html: {rows: 5, style: "height: 100px;"}
-      <%- else -%>
-      = f.input :<%= attribute.name %>, placeholder: "<%= attribute.name %>"
-      <%- end -%>
+  <%- if Gem::Specification.find_all_by_name("turbo_editable").any? -%>
+  = editable_input @<%= singular_table_name %>, :<%= attribute.name %> do
+    <%- if attribute.reference? -%>
+    = f.association :<%= attribute.name %>
+    <%- elsif attribute.type == :boolean -%>
+    = f.input :<%= attribute.name %>, wrapper: :custom_boolean_switch
+    <%- elsif attribute.type == :text -%>
+    = f.input :<%= attribute.name %>, as: :text, input_html: {rows: 5, style: "height: 100px;"}
+    <%- else -%>
+    = f.input :<%= attribute.name %>
+    <%- end -%>
+  <%- else -%>
+  <%- if attribute.reference? -%>
+  = f.association :<%= attribute.name %>
+  <%- elsif attribute.type == :boolean -%>
+  = f.input :<%= attribute.name %>, wrapper: :custom_boolean_switch
+  <%- elsif attribute.type == :text -%>
+  = f.input :<%= attribute.name %>, as: :text, input_html: {rows: 5, style: "height: 100px;"}
+  <%- else -%>
+  = f.input :<%= attribute.name %>
+  <%- end -%>
+  <%- end -%>
 
   <%- end -%>
-  .form-actions
-    = f.button :submit, class: "btn btn-success"
+  = f.button :submit, class: "btn btn-success"

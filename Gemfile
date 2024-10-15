@@ -54,6 +54,8 @@ gem 'fast_excel_rails'
 
 gem "simple_form"
 gem "devise"
+gem "faker"
+gem 'acts_as_list', '~> 1.1'
 
 # gem "custom_table", "~> 1.0"
 gem 'custom_table', path: './embedded_gems/custom_table' 

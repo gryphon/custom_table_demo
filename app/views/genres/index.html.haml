@@ -1,0 +1,7 @@
+%h2.d-flex
+  .flex-grow-1
+    = genre_icon
+    Genres
+
+= custom_table_filter Genre
+= custom_table_data @genres, tree: true, paginate: false
