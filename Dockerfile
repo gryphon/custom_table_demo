@@ -1,11 +1,7 @@
 FROM timbru31/ruby-node:3.2-18
 
-RUN apt-get update -qq && apt-get install -y libmariadb-dev tzdata
-RUN apt-get install -y libvips graphviz
-RUN apt-get install -y nano
-RUN apt-get install -y python3-pip
+RUN apt-get update -qq && apt-get install -y nano
 RUN apt-get install -y zip
-RUN pip install --break-system-packages xlsx2csv
 
 # Speed up install of some gems
 # RUN gem install sass-rails -v 6.0.0
@@ -28,10 +24,6 @@ RUN rm -rf /custom_table_demo/tmp/* /custom_table_demo/log/*
 
 ARG WITHOUT_ASSETS
 RUN if [[ -z "$WITHOUT_ASSETS" ]]; then RAILS_ENV=production SECRET_KEY_BASE=nokey rails assets:precompile; fi;
-
-## Add the wait script to the image
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
-RUN chmod +x /wait
 
 COPY entrypoint.sh /usr/bin/
 RUN chmod +x /usr/bin/entrypoint.sh
